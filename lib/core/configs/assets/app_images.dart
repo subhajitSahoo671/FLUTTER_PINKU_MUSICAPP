@@ -1,0 +1,17 @@
+class AppImages {
+
+  static const String basePath = 'assets/images/';
+  static const String format = '.png';
+
+  static const String logoLight =
+      '${basePath}pinkun_logo$format';
+
+  static const String logoDark =
+      '${basePath}pinkun3$format';
+
+  static const String introBG =
+      '${basePath}get_started$format';
+
+  static const String modeBG =
+      '${basePath}mode_bg$format';
+}
