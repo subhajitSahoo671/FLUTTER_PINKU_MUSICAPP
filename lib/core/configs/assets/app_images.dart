@@ -14,4 +14,7 @@ class AppImages {
 
   static const String modeBG =
       '${basePath}mode_bg$format';
+
+  static const String authBG =
+      '${basePath}pink_girl1$format';
 }
