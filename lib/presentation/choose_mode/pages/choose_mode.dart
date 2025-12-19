@@ -5,9 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pinku_app/common/widgets/button/basic_app_button.dart';
 import 'package:flutter_pinku_app/common/widgets/hero_widgets/app_logo_widget.dart';
 import 'package:flutter_pinku_app/core/configs/assets/app_images.dart';
+import 'package:flutter_pinku_app/presentation/auth/pages/signup_or_signin.dart';
 //import 'package:flutter_pinku_app/core/configs/assets/app_vectors.dart';
 //import 'package:flutter_pinku_app/core/configs/theme/app_colors.dart';
-import 'package:flutter_pinku_app/presentation/auth/pages/signup_or_signin.dart';
+//import 'package:flutter_pinku_app/presentation/auth/pages/signup_or_signin.dart';
 import 'package:flutter_pinku_app/presentation/choose_mode/widgets/mode_widgets.dart';
 //import 'package:flutter_pinku_app/presentation/choose_mode/bloc/theme_cubit.dart';
 //import 'package:flutter_pinku_app/presentation/intro/pages/get_started.dart';
@@ -31,20 +32,20 @@ class ChooseModePage extends StatelessWidget {
           ),
           Container(color: Colors.black.withAlpha(120)),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 50),
+            padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 60),
             child: Column(
                 children: [
                   //  Padding(padding: EdgeInsets.only(top: 15)),
                   Align(
                     alignment: Alignment.topCenter,
-                    child: AppLogoWidget(width: 60, height: 60)
+                    child: AppLogoWidget(width: 55, height: 55)
                   ),
                   Spacer(),
                   Text(
                     "Choose Mode",
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 23,
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -53,17 +54,13 @@ class ChooseModePage extends StatelessWidget {
                   SizedBox(height: 60),
                   BasicAppButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (BuildContext context) =>
-                              const SignupOrSignin(),
-                        ),
-                      );
+                      Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                return const SignupOrSignin();
+                              },));
                     },
                     title: "Continue",
                   ),
-                  SizedBox(height: 35),
+                  SizedBox(height: 30),
                 ],
               ),
           ),

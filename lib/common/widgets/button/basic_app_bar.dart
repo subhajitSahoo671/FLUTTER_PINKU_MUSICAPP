@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pinku_app/core/configs/theme/app_colors.dart';
+//import 'package:flutter_pinku_app/presentation/auth/pages/signup_or_signin.dart';
+//import 'package:flutter_pinku_app/presentation/auth/pages/signup_or_signin.dart';
 
 class BasicAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const BasicAppBar({super.key, this.title});
+  const BasicAppBar({super.key, this.title,});
 
   final Widget? title;
   @override
@@ -34,7 +36,7 @@ class BasicAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
     );
   }
-  
+
   @override
   Size get preferredSize => Size.fromHeight(kToolbarHeight);
 }

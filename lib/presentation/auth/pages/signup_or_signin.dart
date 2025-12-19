@@ -5,6 +5,7 @@ import 'package:flutter_pinku_app/common/widgets/hero_widgets/app_logo_widget.da
 import 'package:flutter_pinku_app/core/configs/assets/app_images.dart';
 import 'package:flutter_pinku_app/core/configs/assets/app_vectors.dart';
 import 'package:flutter_pinku_app/core/configs/theme/app_colors.dart';
+import 'package:flutter_pinku_app/presentation/auth/pages/signin.dart';
 import 'package:flutter_pinku_app/presentation/auth/pages/signup.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -36,62 +37,68 @@ class SignupOrSignin extends StatelessWidget {
             ),
             child: Align(
               alignment: Alignment.center,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  AppLogoWidget(width: 85, height: 85),
-                  SizedBox(height: 60),
-                  Text(
-                    "Enjoy Listening To Music",
-                    style: TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).primaryTextTheme.bodyMedium?.color,
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    "Spotify is a proprietary Swedish audio streaming and media services provider ",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.greyText,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 30),
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: BasicAppButton(
-                          onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (BuildContext context){
-                              return SignupPage();
-                            }));
-                          },
-                          title: "Register",
-                          height: 73,
-                        ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    AppLogoWidget(width: 80, height: 80),
+                    SizedBox(height: 60),
+                    Text(
+                      "Enjoy Listening To Music",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).primaryTextTheme.bodyMedium?.color,
                       ),
-                      SizedBox(width: 20,),
-                      Expanded(
-                        flex: 1,
-                        child: TextButton(
-                          onPressed: () {},
-                          child: Text("Sign in",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                          ),
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      "Spotify is a proprietary Swedish audio streaming and media services provider ",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.greyText,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 30),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: BasicAppButton(
+                            onPressed: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                return  SignupPage();
+                              },));
+                            },
+                            title: "Register",
+                            height: 67,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 160,)
-                ],
+                        SizedBox(width: 20,),
+                        Expanded(
+                          flex: 1,
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                return const SigninPage();
+                              },));
+                            },
+                            child: Text("Sign in",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 19,
+                            ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 160,)
+                  ],
+                ),
               ),
             ),
           ),

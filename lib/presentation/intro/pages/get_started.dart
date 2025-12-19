@@ -25,34 +25,34 @@ class GetStartedPage extends StatelessWidget {
           ),
           Container(color: Colors.black.withAlpha(80)),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 50),
+            padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 60),
             child: Column(
                 children: [
                   //  Padding(padding: EdgeInsets.only(top: 15)),
                   Align(
                     alignment: Alignment.topCenter,
-                    child: AppLogoWidget(width: 60, height: 60)
+                    child: AppLogoWidget(width: 55, height: 55)
                   ),
                   Spacer(),
                   Text(
                     "Enjoy Listening To Music",
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 25,
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 35),
+                  SizedBox(height: 30),
                   Text(
                     "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sagittis enim purus sed phasellus. Cursus ornare id scelerisque aliquam.",
                     style: TextStyle(
                       color: AppColors.greyText,
-                      fontSize: 16,
+                      fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 45),
+                  SizedBox(height: 40),
                   BasicAppButton(
                     onPressed: () {
                       Navigator.push(
@@ -64,8 +64,9 @@ class GetStartedPage extends StatelessWidget {
                       );
                     },
                     title: "Get Started",
+                    height: 72,
                   ),
-                  SizedBox(height: 40),
+                  SizedBox(height: 30),
                 ],
               ),
           ),

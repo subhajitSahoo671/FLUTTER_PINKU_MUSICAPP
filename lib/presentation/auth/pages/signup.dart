@@ -1,73 +1,165 @@
+// import 'dart:math';
+// import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_pinku_app/common/widgets/button/basic_app_bar.dart';
+import 'package:flutter_pinku_app/common/widgets/button/basic_app_button.dart';
 import 'package:flutter_pinku_app/common/widgets/hero_widgets/app_logo_widget.dart';
+import 'package:flutter_pinku_app/data/models/auth/create_user_req.dart';
+import 'package:flutter_pinku_app/domain/usecases/auth/signup.dart';
+import 'package:flutter_pinku_app/presentation/auth/pages/signin.dart';
+import 'package:flutter_pinku_app/presentation/root/pages/root.dart';
+import 'package:flutter_pinku_app/service_locator.dart';
+//import 'package:flutter_pinku_app/core/configs/theme/app_colors.dart';
 //import 'package:flutter_pinku_app/core/configs/assets/app_vectors.dart';
 //import 'package:flutter_svg/svg.dart';
 
 class SignupPage extends StatelessWidget {
-  const SignupPage({super.key});
+  SignupPage({super.key});
+
+  final TextEditingController _fullName = TextEditingController();
+  final TextEditingController _email = TextEditingController();
+  final TextEditingController _password = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: BasicAppBar(
-        title: AppLogoWidget(width: 47, height: 47)
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 30,
-          vertical: 50,
+      //bottomNavigationBar: _signInText(),
+      persistentFooterButtons: [_signInText(context)],
+      persistentFooterDecoration: BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(30),
+          topLeft: Radius.circular(30),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(height: 30,),
-            _registerText(),
-            SizedBox(height: 40,),
-            _fullNameField(context),
-            SizedBox(height: 20,),
-            _emailField(),
-            SizedBox(height: 20,),
-            _passwordField(),
-          ],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.purpleAccent.withAlpha(2),
+            blurRadius: 5,
+            offset: Offset(0, -5),
+          ),
+        ],
+        border: Border(
+          top: BorderSide(
+            color: Colors.purpleAccent.withAlpha(200),
+            width: 0.5,
+          ),
+        ),
+      ),
+      appBar: BasicAppBar(title: AppLogoWidget(width: 45, height: 45)),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 40),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(height: 30),
+              _registerText(),
+              SizedBox(height: 40),
+              _fullNameField(context),
+              SizedBox(height: 20),
+              _emailField(),
+              SizedBox(height: 20),
+              _passwordField(),
+              SizedBox(height: 40),
+              BasicAppButton(
+                onPressed: () async {
+                  var result = await sl<SignupUseCase>().call(
+                    params: CreateUserReq(
+                      fullName: _fullName.text.toString(),
+                      email: _email.text.toString(),
+                      password: _password.text.toString(),
+                    ),
+                  );
+
+                  result.fold(
+                    (l) {
+                      var snackBar = SnackBar(content: Text(l));
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    },
+                    (r) {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return RootPage();
+                          },
+                        ),
+                        (route) => false,
+                      );
+                    },
+                  );
+                },
+                title: "Create Account",
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _registerText(){
+  Widget _registerText() {
     return Text(
       "Register",
-      style: TextStyle(
-        fontSize: 30,
-        fontWeight: FontWeight.bold,
-      ),
+      style: TextStyle(fontSize: 27, fontWeight: FontWeight.bold),
       textAlign: TextAlign.center,
     );
   }
-  
-  Widget _fullNameField(BuildContext context){
+
+  Widget _fullNameField(BuildContext context) {
     return TextField(
+      controller: _fullName,
       decoration: InputDecoration(
         labelText: "Full Name",
-      ).applyDefaults(
-        Theme.of(context).inputDecorationTheme,
-      )
+      ).applyDefaults(Theme.of(context).inputDecorationTheme),
     );
   }
 
-  Widget _emailField(){
+  Widget _emailField() {
     return TextField(
-      decoration: InputDecoration(
-        labelText: "Enter Email",
-      ),
+      controller: _email,
+      decoration: InputDecoration(labelText: "Enter Email"),
     );
   }
 
-  Widget _passwordField(){
+  Widget _passwordField() {
     return TextField(
-      decoration: InputDecoration(
-        labelText: "Password",
+      controller: _password,
+      decoration: InputDecoration(labelText: "Password"),
+    );
+  }
+
+  Widget _signInText(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            "Already have an account? ",
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return const SigninPage();
+                  },
+                ),
+              );
+            },
+            child: Text(
+              "Sign In",
+              style: TextStyle(
+                fontSize: 14,
+                //color: AppColors.primary.withValues(blue: 1),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
