@@ -3,16 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pinku_app/common/widgets/button/basic_app_bar.dart';
 import 'package:flutter_pinku_app/common/widgets/button/basic_app_button.dart';
 import 'package:flutter_pinku_app/common/widgets/hero_widgets/app_logo_widget.dart';
+import 'package:flutter_pinku_app/data/models/auth/signin_user_req.dart';
+import 'package:flutter_pinku_app/domain/usecases/auth/signin.dart';
 import 'package:flutter_pinku_app/presentation/auth/pages/signup.dart';
+import 'package:flutter_pinku_app/presentation/home/pages/home.dart';
+import 'package:flutter_pinku_app/service_locator.dart';
 
 class SigninPage extends StatelessWidget {
-  const SigninPage({super.key});
+   SigninPage({super.key});
+
+  final  TextEditingController _email = TextEditingController();
+  final  TextEditingController _password = TextEditingController();
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       //bottomNavigationBar: _signInText(),
-      persistentFooterButtons: [_signInText(context)],
+      persistentFooterButtons: [_signInFooterText(context)],
       persistentFooterDecoration: BoxDecoration(
         borderRadius: BorderRadius.only(
           topRight: Radius.circular(30),
@@ -46,7 +54,24 @@ class SigninPage extends StatelessWidget {
               SizedBox(height: 20),
               _passwordField(),
               SizedBox(height: 40),
-              BasicAppButton(onPressed: () {}, title: "Create Account"),
+              BasicAppButton(onPressed: () async{
+                var result = await sl<SigninUseCase>().call(
+                  params: SigninUserReq(
+                    email: _email.text.toString(), 
+                    password: _password.text.toString())
+                );
+
+                result.fold((l) {
+                  var snackBar = SnackBar(content: Text(l),behavior: SnackBarBehavior.floating,);
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                }, (r) {
+                  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
+                    return HomePage();
+                  },), (route) {
+                    return false;
+                  },);
+                },);
+              }, title: "Sign In"),
             ],
           ),
         ),
@@ -64,6 +89,7 @@ class SigninPage extends StatelessWidget {
 
   Widget _emailField(BuildContext context) {
     return TextField(
+      controller: _email,
       decoration: InputDecoration(
         labelText: "Enter Email",
       ).applyDefaults(Theme.of(context).inputDecorationTheme),
@@ -71,10 +97,12 @@ class SigninPage extends StatelessWidget {
   }
 
   Widget _passwordField() {
-    return TextField(decoration: InputDecoration(labelText: "Password"));
+    return TextField(
+      controller: _password,
+      decoration: InputDecoration(labelText: "Password"));
   }
 
-  Widget _signInText(BuildContext context) {
+  Widget _signInFooterText(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
       child: Row(

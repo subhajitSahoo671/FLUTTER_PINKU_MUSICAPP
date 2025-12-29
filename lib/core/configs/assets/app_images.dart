@@ -17,4 +17,7 @@ class AppImages {
 
   static const String authBG =
       '${basePath}pink_girl1$format';
+
+  static const String homeTopArtist =
+      '${basePath}homeArtist$format';
 }

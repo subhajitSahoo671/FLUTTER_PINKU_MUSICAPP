@@ -1,0 +1,147 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_pinku_app/common/helpers/is_dark_mode.dart';
+import 'package:flutter_pinku_app/common/widgets/button/basic_app_bar.dart';
+import 'package:flutter_pinku_app/common/widgets/hero_widgets/app_logo_widget.dart';
+import 'package:flutter_pinku_app/core/configs/assets/app_images.dart';
+//import 'package:flutter_pinku_app/core/configs/assets/app_vectors.dart';
+import 'package:flutter_pinku_app/core/configs/theme/app_colors.dart';
+import 'package:flutter_pinku_app/presentation/home/widgets/news_songs.dart';
+import 'package:flutter_pinku_app/presentation/home/widgets/play_list.dart';
+//import 'package:flutter_svg/flutter_svg.dart';
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: BasicAppBar(
+        title: AppLogoWidget(width: 45, height: 45),
+        hideBackBotton: true,
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 25),
+          child: Column(
+            //mainAxisAlignment: MainAxisAlignment.center,
+            //crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _homeTopArtistCard(context),
+              SizedBox(height: 10),
+              DefaultTabController(
+                length: 4,
+                child: Column(
+                  children: [
+                    _tabs(),
+                    SizedBox(
+                      height: 280,
+                      child: TabBarView(
+                        children: [
+                          NewsSongs(),
+                          Container(),
+                          Container(),
+                          Container(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 25,),
+              PlayList()
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _homeTopArtistCard(context) {
+    return Center(
+      child: SizedBox(
+        height: 150,
+        width: MediaQuery.of(context).size.width,
+        child: Stack(
+          children: [
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                transform: Matrix4.translationValues(0, -20, 0),
+                width: MediaQuery.of(context).size.width,
+                height: 110,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Row(
+                    children: [
+                      Flexible(
+                        flex: 6,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: 170,
+                              child: Text(
+                                "Now Album Happier Than Ever",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              "Smruti Eillish",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12,
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Flexible(flex: 4, child: Container()),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Transform(
+                transform: Matrix4.translationValues(0, -20, 0),
+                child: Image.asset(
+                  AppImages.homeTopArtist,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _tabs() {
+    return TabBar(
+      isScrollable: true,
+      dividerColor: Colors.transparent,
+      labelColor: context.isDarkMode ? Colors.white : Colors.black,
+      labelStyle: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
+      labelPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 3),
+      tabAlignment: TabAlignment.center,
+      indicatorSize: TabBarIndicatorSize.tab,
+      tabs: [Text("News"), Text("Videos"), Text("Artist"), Text("Podcasts")],
+    );
+  }
+}

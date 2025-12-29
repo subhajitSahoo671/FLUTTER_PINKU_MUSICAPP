@@ -64,7 +64,7 @@ class GetStartedPage extends StatelessWidget {
                       );
                     },
                     title: "Get Started",
-                    height: 72,
+                   // height: 72,
                   ),
                   SizedBox(height: 30),
                 ],
