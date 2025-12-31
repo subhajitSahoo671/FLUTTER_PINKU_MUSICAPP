@@ -91,7 +91,7 @@ class AppTheme {
         elevation: 3.0, // Adjust the elevation for shadow depth
         shadowColor: Colors.purpleAccent, // Customize shadow color
         backgroundColor: AppColors.primary,
-        foregroundColor: Colors.grey.shade900,
+        foregroundColor: Colors.white,
         textStyle: const TextStyle(
           fontSize: 22,
           fontWeight: FontWeight.bold,

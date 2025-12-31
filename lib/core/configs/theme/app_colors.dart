@@ -17,5 +17,7 @@ class AppColors {
   //static const greyText = Color(0xFFBEBEBE);
   static const greyText = Color(0xFF797979);
   static const darkGrey = Color(0xFF343434);
-
+  
+  static const gradient_1 = Color(0xFFEF007E);
+  static const gradient_2 = Color(0xFF7C007E);
 }

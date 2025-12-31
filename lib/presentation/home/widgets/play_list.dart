@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_pinku_app/common/helpers/is_dark_mode.dart';
 import 'package:flutter_pinku_app/core/configs/theme/app_colors.dart';
 import 'package:flutter_pinku_app/domain/entities/song/song.dart';
 import 'package:flutter_pinku_app/presentation/home/bloc/play_list_cubit.dart';
 import 'package:flutter_pinku_app/presentation/home/bloc/play_list_state.dart';
+import 'package:flutter_pinku_app/presentation/song_player/pages/song_player.dart';
 
 class PlayList extends StatelessWidget {
   const PlayList({super.key});
@@ -56,58 +58,91 @@ class PlayList extends StatelessWidget {
     return ListView.separated(
       itemCount: songs.length,
       separatorBuilder: (BuildContext context, int index) {
-        return SizedBox(height: 15);
+        return SizedBox(height: 17);
       },
       shrinkWrap: true,
       itemBuilder: (BuildContext context, int index) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 19,
-              backgroundColor: AppColors.greyText
-                  .withBlue(50)
-                  .withValues(alpha: 200),
-              child: Icon(Icons.play_arrow_rounded),
-            ),
-            SizedBox(width: 10,),
-             Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(songs[index].title,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    // color: Colors.white
-                  ),),
-                  SizedBox(height: 5,),
-                  Text(songs[index].artist,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    // color: Colors.white
-                  ),)
-                ],
+        return GestureDetector(
+           onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return SongPlayerPage(songEntity: songs[index],);
+                },
               ),
+            );
+          },
+          child: SizedBox(
+            width: MediaQuery.sizeOf(context).width,
+            child: Row(
+              //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  flex: 6,
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 17,
+                    backgroundColor: AppColors.greyText
+                        .withBlue(50)
+                        .withValues(alpha: 200),
+                    child: Icon(Icons.play_arrow_rounded,
+                    size: 25,
+                    color: context.isDarkMode ? Colors.white : Colors.black,
+                    ),
+                  ),
+                  SizedBox(width: 10,),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(songs[index].title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          // color: Colors.white
+                        ),),
+                        SizedBox(height: 5,),
+                        Text(songs[index].artist,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: true,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          // color: Colors.white
+                        ),)
+                      ],
+                    ),
+                  ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  flex: 4,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(songs[index].duration.toString().replaceAll('.', ':'),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14
+                      ),
+                      ),
+                       SizedBox(width: 50,),
+                       Icon(Icons.favorite_border_rounded,
+                      //  color: AppColors.greyText.withBlue(50).withValues(alpha: 100)
+                      color: Colors.purpleAccent.shade700.withGreen(100),
+                       )
+                    ],
+                  ),
+                )
               ],
             ),
-            Row(
-              children: [
-                Text(songs[index].duration.toString().replaceAll('.', ':'),
-                style: TextStyle(
-                  fontWeight: FontWeight.bold
-                ),
-                ),
-                 SizedBox(width: 40,),
-                 Icon(Icons.favorite_border_rounded,
-                //  color: AppColors.greyText.withBlue(50).withValues(alpha: 100)
-                color: Colors.purpleAccent.shade700.withGreen(100),
-                 )
-              ],
-            )
-          ],
+          ),
         );
       },
     );

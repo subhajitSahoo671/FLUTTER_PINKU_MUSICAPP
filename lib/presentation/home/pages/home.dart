@@ -71,7 +71,7 @@ class _HomePageState extends State<HomePage> {
             Align(
               alignment: Alignment.bottomCenter,
               child: Container(
-                transform: Matrix4.translationValues(0, -20, 0),
+                transform: Matrix4.translationValues(0, -15, 0),
                 width: MediaQuery.of(context).size.width,
                 height: 110,
                 decoration: BoxDecoration(
@@ -119,7 +119,7 @@ class _HomePageState extends State<HomePage> {
             Align(
               alignment: Alignment.bottomRight,
               child: Transform(
-                transform: Matrix4.translationValues(0, -20, 0),
+                transform: Matrix4.translationValues(0, -15, 0),
                 child: Image.asset(
                   AppImages.homeTopArtist,
                   fit: BoxFit.cover,
