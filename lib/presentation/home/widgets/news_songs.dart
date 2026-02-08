@@ -1,17 +1,20 @@
 // import 'dart:developer';
 
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_pinku_app/core/configs/theme/app_colors.dart';
+import 'package:flutter_pinku_app/core/services/my_audio_handler.dart';
 //import 'package:flutter_pinku_app/common/helpers/is_dark_mode.dart';
 // import 'package:flutter_pinku_app/core/configs/constants/app_urls.dart';
-import 'package:flutter_pinku_app/domain/entities/song/song.dart';
+// import 'package:flutter_pinku_app/domain/entities/song/song.dart';
 import 'package:flutter_pinku_app/presentation/home/bloc/news_songs_cubit.dart';
 import 'package:flutter_pinku_app/presentation/home/bloc/news_songs_state.dart';
 import 'package:flutter_pinku_app/presentation/song_player/pages/song_player.dart';
 
 class NewsSongs extends StatelessWidget {
-  const NewsSongs({super.key});
+  final MyAudioHandler audioHandler;
+  const NewsSongs({super.key, required this.audioHandler});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +33,18 @@ class NewsSongs extends StatelessWidget {
                 );
               }
               if (state is NewsSongsLoaded) {
-                return _songs(state.songs);
+                return FutureBuilder<List<MediaItem>>(
+                  future: state.getMediaItems(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator.adaptive());
+                    }
+                    if (snapshot.hasData && snapshot.data != null) {
+                      return _songs(snapshot.data!);
+                    }
+                    return SizedBox.shrink();
+                  },
+                );
               }
 
               return Text('Error loading songs');
@@ -41,7 +55,7 @@ class NewsSongs extends StatelessWidget {
     );
   }
 
-  Widget _songs(List<SongEntity> songs) {
+  Widget _songs(List<MediaItem> songs) {
     // log(songs[0].imageURL);
     return ListView.separated(
       scrollDirection: Axis.horizontal,
@@ -51,13 +65,18 @@ class NewsSongs extends StatelessWidget {
       },
       shrinkWrap: true,
       itemBuilder: (BuildContext context, int index) {
-        return GestureDetector(
+        return StreamBuilder<MediaItem?>(stream: audioHandler.mediaItem, builder: (context, snapshot) {
+          if (snapshot.data != null) {
+            GestureDetector(
           onTap: () {
+              if (snapshot.data!.id != songs[index].id) {
+                  audioHandler.skipToQueueItem(index);
+                }
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) {
-                  return SongPlayerPage(songEntity: songs[index]);
+                  return SongPlayerPage(item: snapshot.data!,audioHandler: audioHandler,index: index);
                 },
               ),
             );
@@ -74,7 +93,7 @@ class NewsSongs extends StatelessWidget {
                     borderRadius: BorderRadius.circular(30),
                     image: DecorationImage(
                       fit: BoxFit.cover,
-                      image: NetworkImage(songs[index].imageURL),
+                      image: NetworkImage(songs[index].artUri.toString()),
                     ),
                   ),
                   child: Align(
@@ -106,7 +125,7 @@ class NewsSongs extends StatelessWidget {
                 ),
                 SizedBox(height: 5),
                 Text(
-                  songs[index].artist,
+                  songs[index].artist!,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   softWrap: true,
@@ -120,6 +139,9 @@ class NewsSongs extends StatelessWidget {
             ),
           ),
         );
+          }
+          return SizedBox.shrink();
+        },);
       },
     );
   }

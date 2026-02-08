@@ -1,14 +1,22 @@
+
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+// import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_pinku_app/core/configs/theme/app_colors.dart';
-import 'package:flutter_pinku_app/domain/entities/song/song.dart';
-import 'package:flutter_pinku_app/presentation/song_player/bloc/song_player_cubit.dart';
-import 'package:flutter_pinku_app/presentation/song_player/bloc/song_player_state.dart';
+import 'package:flutter_pinku_app/core/services/my_audio_handler.dart';
+// import 'package:flutter_pinku_app/domain/entities/song/song.dart';
+// import 'package:flutter_pinku_app/presentation/song_player/bloc/song_player_cubit.dart';
+//import 'package:flutter_pinku_app/presentation/song_player/bloc/song_player_state.dart';
 // import 'package:flutter_pinku_app/core/configs/theme/app_colors.dart';
 
 class SongPlayerPage extends StatelessWidget {
-  final SongEntity songEntity;
-  const SongPlayerPage({super.key, required this.songEntity});
+  final MediaItem item;
+  
+  final int index;
+  
+  final MyAudioHandler audioHandler;
+  
+  const SongPlayerPage({super.key, required this.item,required this.index, required this.audioHandler});
 
   @override
   Widget build(BuildContext context) {
@@ -37,79 +45,103 @@ class SongPlayerPage extends StatelessWidget {
         backgroundColor: AppColors.gradient_1,
         elevation: 0,
       ),
-      body: BlocProvider(
-        create: (context) => SongPlayerCubit()..loadSong(songEntity.songURL),
-        child: Container(
+      body: _PlayerContent(item: item, audioHandler: audioHandler),
+    );
+  }
+}
+
+class _PlayerContent extends StatelessWidget {
+  final MediaItem item;
+  final MyAudioHandler audioHandler;
+
+  const _PlayerContent({required this.item, required this.audioHandler});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
           height: MediaQuery.sizeOf(context).height,
           width: MediaQuery.sizeOf(context).width,
           color: AppColors.gradient_1,
-          child: Stack(
-            children: [
-              Container(
-                height: MediaQuery.sizeOf(context).height,
-                width: MediaQuery.sizeOf(context).width,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.white, Color(0xFF7C007E)],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
+          child: StreamBuilder<MediaItem?>(
+            stream: audioHandler.mediaItem,
+            builder: (context, itemSnapshot) {
+
+              if (itemSnapshot.data == null) {
+                return Center(
+                  child: CircularProgressIndicator.adaptive(),
+                );
+              }
+              return Stack(
+                children: [
+                  Container(
+                    height: MediaQuery.sizeOf(context).height,
+                    width: MediaQuery.sizeOf(context).width,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.white, Color(0xFF7C007E)],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(30),
+                        topRight: Radius.circular(30),
+                      ),
+                    ),
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 40),
+                      child: Column(
+                        children: [
+                          //SizedBox(height: 40),
+                          _songCover(context, itemSnapshot.data!),
+                          SizedBox(height: 30),
+                          _songDetails(itemSnapshot.data!),
+                          SizedBox(height: 70),
+                          songTools(context),
+                          SizedBox(height: 50),
+                          _songSlider(context, itemSnapshot.data!), 
+                        ],
+                      ),
+                    ),
                   ),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: _songPlayer(context),
                   ),
-                ),
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 40),
-                  child: Column(
-                    children: [
-                      //SizedBox(height: 40),
-                      _songCover(context),
-                      SizedBox(height: 20),
-                      _songDetails(),
-                      SizedBox(height: 60),
-                      songTools(context),
-                      SizedBox(height: 40),
-                      _songSlider(context),
-                    ],
-                  ),
-                ),
-              ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: _songPlayer(context),
-              ),
-            ],
+                ],
+              );
+            }
           ),
-        ),
-      ),
-    );
+        );
   }
 
-  Widget _songCover(BuildContext context) {
+  Widget _songCover(BuildContext context, MediaItem itemSnapshot) {
     return Container(
       height: MediaQuery.of(context).size.width / 1.4,
       width: MediaQuery.of(context).size.width / 1.4,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         image: DecorationImage(
-          image: NetworkImage(songEntity.imageURL),
+          image: NetworkImage(itemSnapshot.artUri.toString()),
           fit: BoxFit.cover,
         ),
       ),
     );
   }
 
-  Widget _songDetails() {
+  Widget _songDetails( MediaItem itemSnapshot) {
     return Column(
       children: [
         Text(
-          songEntity.title,
+          itemSnapshot.title,
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
           style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 10),
         Text(
-          songEntity.artist,
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+          itemSnapshot.artist ?? 'Unknown Artist',
           style: TextStyle(
             color: Colors.pinkAccent.shade700,
             fontSize: 12,
@@ -171,58 +203,45 @@ class SongPlayerPage extends StatelessWidget {
     );
   }
 
-  Widget _songSlider(BuildContext context) {
-    return BlocBuilder<SongPlayerCubit, SongPlayerState>(
-      builder: (context, state) {
-        if (state is SongPlayerLoading) {
-          // var id = context.read<SongPlayerCubit>().songDuration.toString();
-          // log(id);
-          // log(songEntity.duration.toString());
-          return CircularProgressIndicator.adaptive();
-        }
-        if (state is SongPlayerLoaded) {
-          return Column(
-            children: [
-              Slider(
-                value: context
-                    .read<SongPlayerCubit>()
-                    .songPosition
-                    .inSeconds
-                    .toDouble(),
-                min: 0.0,
-                max: context
-                    .read<SongPlayerCubit>()
-                    .songDuration
-                    .inSeconds
-                    .toDouble(),
-                onChanged: (value) {},
-              ),
-              // SizedBox(height: 5,),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      formatDuration(
-                        context.read<SongPlayerCubit>().songPosition,
-                      ),
-                    ),
-                    Text(
-                      formatDuration(
-                        context.read<SongPlayerCubit>().songDuration,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          );
-        }
+  Widget _songSlider(BuildContext context, MediaItem itemSnapshot) {
 
-        return Container();
-      },
-    );
+        return StreamBuilder<Duration>(
+          stream: AudioService.position,
+          builder: (context, positionSnap) {
+            final position = positionSnap.data ?? Duration.zero;     
+            //  log(positionSnap.data as num);
+           
+            final total = itemSnapshot.duration ?? Duration.zero;
+            // Avoid division by zero when duration is zero.
+            final maxSeconds = total.inSeconds > 0 ? total.inSeconds.toDouble() : 1.0;
+            final value = position.inSeconds.toDouble().clamp(0.0, maxSeconds);
+
+            return Column(
+              children: [
+                Slider(
+                  value: value,
+                  min: 0.0,
+                  max: maxSeconds,
+                 // divisions: value.toInt() > 0 ? value.toInt() : null,
+                  onChanged: (v) {
+                    audioHandler.seek(Duration(seconds: v.toInt()));
+                  },
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(formatDuration(position)),
+                      Text(formatDuration(total)),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      
   }
 
   String formatDuration(Duration duration) {
@@ -232,82 +251,83 @@ class SongPlayerPage extends StatelessWidget {
   }
 
   Widget _songPlayer(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: 100,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
-        ),
-        gradient: LinearGradient(
-          colors: [AppColors.gradient_1, AppColors.gradient_2],
-          begin: AlignmentGeometry.topLeft,
-          end: AlignmentGeometry.bottomRight,
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(
-              size: 35,
-              color: Colors.white,
-              Icons.skip_previous_rounded,
+    return StreamBuilder<PlaybackState>(
+      stream: audioHandler.playbackState.stream,
+      builder: (context, snapshot) {
+        bool playing = snapshot.data?.playing ?? false;
+        return Container(
+          width: MediaQuery.of(context).size.width,
+          height: 100,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
+            ),
+            gradient: LinearGradient(
+              colors: [AppColors.gradient_1, AppColors.gradient_2],
+              begin: AlignmentGeometry.topLeft,
+              end: AlignmentGeometry.bottomRight,
             ),
           ),
-          SizedBox(width: 30),
-          VerticalDivider(
-            width: 3,
-            color: Colors.white,
-            indent: 30,
-            endIndent: 30,
-            thickness: 1,
-            radius: BorderRadius.circular(30),
-          ),
-          SizedBox(width: 30),
-          BlocBuilder<SongPlayerCubit, SongPlayerState>(
-            builder: (context, state) {
-              if (state is SongPlayerLoaded) {
-                return IconButton(
-                  onPressed: () {
-                    context.read<SongPlayerCubit>().playOrPauseSong();
-                  },
-                  icon: Icon(
-                    size: 40,
-                    color: Colors.white,
-                    context.read<SongPlayerCubit>().audioPlayer.playing
-                        ? Icons.pause
-                        : Icons.play_arrow_rounded,
-                  ),
-                );
-              }
-
-              return Icon(
-                size: 40,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              IconButton(
+                onPressed: () {
+                  audioHandler.skipToPrevious();
+                },
+                icon: Icon(
+                  size: 35,
+                  color: Colors.white,
+                  Icons.skip_previous_rounded,
+                ),
+              ),
+              SizedBox(width: 30),
+              VerticalDivider(
+                width: 3,
                 color: Colors.white,
-                Icons.play_arrow_rounded,
-              );
-            },
+                indent: 30,
+                endIndent: 30,
+                thickness: 1,
+                radius: BorderRadius.circular(30),
+              ),
+              SizedBox(width: 30),
+              IconButton(
+                onPressed: () {
+                  if (playing) {
+                    audioHandler.pause();
+                  } else {
+                    audioHandler.play();
+                  }
+                },
+                icon: Icon(
+                  size: 40,
+                  color: Colors.white,
+                  playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                ),
+              ),
+              SizedBox(width: 30),
+              VerticalDivider(
+                width: 3,
+                color: Colors.white,
+                indent: 30,
+                endIndent: 30,
+                thickness: 1,
+                radius: BorderRadius.circular(30),
+              ),
+              SizedBox(width: 30),  
+              IconButton(
+                onPressed: () {
+                  audioHandler.skipToNext();
+                },
+                icon:
+                    Icon(size: 35, color: Colors.white, Icons.skip_next_rounded),
+              ),
+            ],
           ),
-          SizedBox(width: 30),
-          VerticalDivider(
-            width: 3,
-            color: Colors.white,
-            indent: 30,
-            endIndent: 30,
-            thickness: 1,
-            radius: BorderRadius.circular(30),
-          ),
-          SizedBox(width: 30),
-          IconButton(
-            onPressed: () {},
-            icon: Icon(size: 35, color: Colors.white, Icons.skip_next_rounded),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

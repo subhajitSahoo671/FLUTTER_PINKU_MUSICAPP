@@ -15,8 +15,18 @@ subprojects {
     val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
     project.layout.buildDirectory.value(newSubprojectBuildDir)
 }
+
 subprojects {
     project.evaluationDependsOn(":app")
+    
+    // Fix namespace issue for library modules
+    plugins.withId("com.android.library") {
+        extensions.getByType<com.android.build.gradle.LibraryExtension>().apply {
+            if (namespace == null) {
+                namespace = "com.leanflutter.${project.name}"
+            }
+        }
+    }
 }
 
 tasks.register<Delete>("clean") {

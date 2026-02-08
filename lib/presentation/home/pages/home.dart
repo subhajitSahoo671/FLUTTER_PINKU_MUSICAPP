@@ -8,6 +8,8 @@ import 'package:flutter_pinku_app/core/configs/theme/app_colors.dart';
 import 'package:flutter_pinku_app/presentation/home/widgets/news_songs.dart';
 import 'package:flutter_pinku_app/presentation/home/widgets/play_list.dart';
 //import 'package:flutter_svg/flutter_svg.dart';
+import 'package:audio_service/audio_service.dart';
+import 'package:flutter_pinku_app/core/services/my_audio_handler.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,6 +19,26 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+   MyAudioHandler _audioHandler = MyAudioHandler();
+
+  @override
+  void initState() {
+    super.initState();
+     _initAudioHandler();
+  }
+
+  Future<void> _initAudioHandler() async {
+     //initialize audioService with myAudioHandler as the audio handler
+    _audioHandler = await AudioService.init(
+      builder: () => MyAudioHandler(),
+      config: const AudioServiceConfig(
+        androidNotificationChannelId: 'com.flutter_pinku_app.channel.audio',
+        androidNotificationChannelName: 'Audio playback',
+        androidNotificationOngoing: true,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,6 +50,7 @@ class _HomePageState extends State<HomePage> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 25),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             //mainAxisAlignment: MainAxisAlignment.center,
             //crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -36,13 +59,14 @@ class _HomePageState extends State<HomePage> {
               DefaultTabController(
                 length: 4,
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    _tabs(),
+                    _tabs(context),
                     SizedBox(
                       height: 280,
                       child: TabBarView(
                         children: [
-                          NewsSongs(),
+                          NewsSongs(audioHandler: _audioHandler,),
                           Container(),
                           Container(),
                           Container(),
@@ -53,7 +77,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               SizedBox(height: 25,),
-              PlayList()
+              PlayList(audioHandler: _audioHandler,)
             ],
           ),
         ),
@@ -132,7 +156,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _tabs() {
+  Widget _tabs(BuildContext context) {
     return TabBar(
       isScrollable: true,
       dividerColor: Colors.transparent,
@@ -144,4 +168,5 @@ class _HomePageState extends State<HomePage> {
       tabs: [Text("News"), Text("Videos"), Text("Artist"), Text("Podcasts")],
     );
   }
+
 }

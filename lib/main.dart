@@ -1,5 +1,7 @@
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_pinku_app/core/configs/theme/app_theme.dart';
 // import 'package:flutter_pinku_app/presentation/auth/pages/signup_or_signin.dart';
@@ -28,6 +30,10 @@ Future<void> main() async {
   await initializeDependencies();
 
   runApp(MyApp());
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    // DeviceOrientation.portraitDown,
+  ]);
 }
 
 class MyApp extends StatelessWidget {
