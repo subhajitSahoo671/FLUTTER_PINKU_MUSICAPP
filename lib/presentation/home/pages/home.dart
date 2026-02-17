@@ -1,42 +1,39 @@
 import 'package:flutter/material.dart';
+// import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_pinku_app/common/helpers/is_dark_mode.dart';
 import 'package:flutter_pinku_app/common/widgets/button/basic_app_bar.dart';
 import 'package:flutter_pinku_app/common/widgets/hero_widgets/app_logo_widget.dart';
 import 'package:flutter_pinku_app/core/configs/assets/app_images.dart';
 //import 'package:flutter_pinku_app/core/configs/assets/app_vectors.dart';
 import 'package:flutter_pinku_app/core/configs/theme/app_colors.dart';
+// import 'package:flutter_pinku_app/presentation/home/bloc/play_list_cubit.dart';
+// import 'package:flutter_pinku_app/presentation/home/bloc/play_list_state.dart';
 import 'package:flutter_pinku_app/presentation/home/widgets/news_songs.dart';
 import 'package:flutter_pinku_app/presentation/home/widgets/play_list.dart';
 //import 'package:flutter_svg/flutter_svg.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter_pinku_app/core/services/my_audio_handler.dart';
 
+
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, required this.audioHandler, this.songs = const []});
+  final MyAudioHandler audioHandler;
+  final List<MediaItem> songs;
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-   MyAudioHandler _audioHandler = MyAudioHandler();
 
-  @override
+    @override
   void initState() {
     super.initState();
-     _initAudioHandler();
+    _audioHandlerInitSongs();
   }
 
-  Future<void> _initAudioHandler() async {
-     //initialize audioService with myAudioHandler as the audio handler
-    _audioHandler = await AudioService.init(
-      builder: () => MyAudioHandler(),
-      config: const AudioServiceConfig(
-        androidNotificationChannelId: 'com.flutter_pinku_app.channel.audio',
-        androidNotificationChannelName: 'Audio playback',
-        androidNotificationOngoing: true,
-      ),
-    );
+  Future<void> _audioHandlerInitSongs() async {
+    await widget.audioHandler.initSongs(songs: widget.songs);
   }
 
   @override
@@ -66,7 +63,7 @@ class _HomePageState extends State<HomePage> {
                       height: 280,
                       child: TabBarView(
                         children: [
-                          NewsSongs(audioHandler: _audioHandler,),
+                          NewsSongs(audioHandler: widget.audioHandler,),
                           Container(),
                           Container(),
                           Container(),
@@ -77,11 +74,11 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               SizedBox(height: 25,),
-              PlayList(audioHandler: _audioHandler,)
-            ],
-          ),
-        ),
-      ),
+              PlayList(audioHandler: widget.audioHandler, songs: widget.songs),
+            ],//
+          ),//
+        ),//
+      ),//
     );
   }
 

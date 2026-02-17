@@ -6,14 +6,27 @@ import 'package:flutter_pinku_app/common/widgets/hero_widgets/app_logo_widget.da
 import 'package:flutter_pinku_app/data/models/auth/signin_user_req.dart';
 import 'package:flutter_pinku_app/domain/usecases/auth/signin.dart';
 import 'package:flutter_pinku_app/presentation/auth/pages/signup.dart';
-import 'package:flutter_pinku_app/presentation/home/pages/home.dart';
+// import 'package:flutter_pinku_app/presentation/home/pages/home.dart';
+import 'package:flutter_pinku_app/presentation/home/pages/root.dart';
 import 'package:flutter_pinku_app/service_locator.dart';
 
-class SigninPage extends StatelessWidget {
-   SigninPage({super.key});
+class SigninPage extends StatefulWidget {
+   const SigninPage({super.key});
 
+  @override
+  State<SigninPage> createState() => _SigninPageState();
+}
+
+class _SigninPageState extends State<SigninPage> {
   final  TextEditingController _email = TextEditingController();
   final  TextEditingController _password = TextEditingController();
+
+  @override
+  void dispose() {
+    _email.dispose();
+    _password.dispose();
+    super.dispose();
+  }
 
 
   @override
@@ -61,12 +74,14 @@ class SigninPage extends StatelessWidget {
                     password: _password.text.toString())
                 );
 
+                if (!mounted) return;
+
                 result.fold((l) {
                   var snackBar = SnackBar(content: Text(l),behavior: SnackBarBehavior.floating,);
                   ScaffoldMessenger.of(context).showSnackBar(snackBar);
                 }, (r) {
                   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
-                    return HomePage();
+                    return RootPage();
                   },), (route) {
                     return false;
                   },);

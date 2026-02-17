@@ -1,9 +1,14 @@
+import 'dart:async';
+// import 'dart:developer';
+
 import 'package:audio_service/audio_service.dart';
+ //import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
 class MyAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler{
 
   AudioPlayer audioPlayer=AudioPlayer();
+  
   
   UriAudioSource _createAudioSource(MediaItem item){
     return ProgressiveAudioSource(Uri.parse(item.id));
@@ -63,6 +68,11 @@ class MyAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler{
     final newQueue = queue.value..addAll(songs);  
     queue.add(newQueue);
 
+    // Ensure we have a current mediaItem for the notification/controls
+    if (newQueue.isNotEmpty && mediaItem.value == null) {
+      mediaItem.add(newQueue[0]);
+    }
+
     //listen for changes in the current song index
     _listenForCurrentSongIndexChanges();
 
@@ -90,7 +100,7 @@ class MyAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler{
   Future<void> skipToQueueItem(int index) async{
     if(index < 0 || index >= queue.value.length) return;
     await audioPlayer.seek(Duration.zero, index: index);
-    play();
+     play();
   }
 
   //skip to the next song in the queue

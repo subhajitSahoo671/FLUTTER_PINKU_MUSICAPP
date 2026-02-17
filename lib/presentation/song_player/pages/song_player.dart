@@ -1,4 +1,6 @@
 
+// import 'dart:developer';
+
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_bloc/flutter_bloc.dart';
@@ -209,7 +211,7 @@ class _PlayerContent extends StatelessWidget {
           stream: AudioService.position,
           builder: (context, positionSnap) {
             final position = positionSnap.data ?? Duration.zero;     
-            //  log(positionSnap.data as num);
+          // log(positionSnap.data.toString());
            
             final total = itemSnapshot.duration ?? Duration.zero;
             // Avoid division by zero when duration is zero.
@@ -255,6 +257,7 @@ class _PlayerContent extends StatelessWidget {
       stream: audioHandler.playbackState.stream,
       builder: (context, snapshot) {
         bool playing = snapshot.data?.playing ?? false;
+       // log("Playing state: $snapshot.data");
         return Container(
           width: MediaQuery.of(context).size.width,
           height: 100,

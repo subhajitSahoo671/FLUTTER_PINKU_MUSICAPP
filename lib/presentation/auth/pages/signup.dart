@@ -8,7 +8,8 @@ import 'package:flutter_pinku_app/common/widgets/hero_widgets/app_logo_widget.da
 import 'package:flutter_pinku_app/data/models/auth/create_user_req.dart';
 import 'package:flutter_pinku_app/domain/usecases/auth/signup.dart';
 import 'package:flutter_pinku_app/presentation/auth/pages/signin.dart';
-import 'package:flutter_pinku_app/presentation/home/pages/home.dart';
+// import 'package:flutter_pinku_app/presentation/home/pages/home.dart';
+import 'package:flutter_pinku_app/presentation/home/pages/root.dart';
 import 'package:flutter_pinku_app/service_locator.dart';
 //import 'package:flutter_pinku_app/core/configs/theme/app_colors.dart';
 //import 'package:flutter_pinku_app/core/configs/assets/app_vectors.dart';
@@ -81,7 +82,7 @@ class SignupPage extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) {
-                            return HomePage();
+                            return RootPage();
                           },
                         ),
                         (route) => false,

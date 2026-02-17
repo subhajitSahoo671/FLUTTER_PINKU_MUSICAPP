@@ -1,5 +1,7 @@
 // import 'dart:developer';
 
+//import 'dart:developer';
+
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -40,7 +42,10 @@ class NewsSongs extends StatelessWidget {
                       return Center(child: CircularProgressIndicator.adaptive());
                     }
                     if (snapshot.hasData && snapshot.data != null) {
-                      return _songs(snapshot.data!);
+                     // log("hy");
+                     if (audioHandler.mediaItem.hasValue) {
+                        return _songs(snapshot.data!);
+                     }
                     }
                     return SizedBox.shrink();
                   },
@@ -56,7 +61,7 @@ class NewsSongs extends StatelessWidget {
   }
 
   Widget _songs(List<MediaItem> songs) {
-    // log(songs[0].imageURL);
+    //log(songs[0].title);
     return ListView.separated(
       scrollDirection: Axis.horizontal,
       itemCount: songs.length,
@@ -66,9 +71,11 @@ class NewsSongs extends StatelessWidget {
       shrinkWrap: true,
       itemBuilder: (BuildContext context, int index) {
         return StreamBuilder<MediaItem?>(stream: audioHandler.mediaItem, builder: (context, snapshot) {
+         
           if (snapshot.data != null) {
-            GestureDetector(
-          onTap: () {
+            // log(  "hy${snapshot.data!.artUri}");
+          return  GestureDetector(
+                 onTap: () {
               if (snapshot.data!.id != songs[index].id) {
                   audioHandler.skipToQueueItem(index);
                 }

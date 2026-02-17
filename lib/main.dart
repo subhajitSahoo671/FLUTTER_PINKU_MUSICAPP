@@ -14,6 +14,10 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'dart:io';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:audio_service/audio_service.dart';
+import 'package:flutter_pinku_app/core/services/my_audio_handler.dart';
 
 
 Future<void> main() async {
@@ -28,6 +32,31 @@ Future<void> main() async {
  );
 
   await initializeDependencies();
+
+  // Request notification permission on Android 13+
+  if (Platform.isAndroid) {
+    final status = await Permission.notification.status;
+    if (!status.isGranted) {
+      await Permission.notification.request();
+    }
+  }
+
+  // Initialize AudioService early so notifications / control center work (Android 13/14+)
+  final audioHandler = await AudioService.init(
+    builder: () => MyAudioHandler(),
+    config: const AudioServiceConfig(
+      androidNotificationChannelId: 'com.flutter_pinku_app.channel.audio',
+      androidNotificationChannelName: 'Audio playback',
+      androidNotificationOngoing: true,
+      //androidStopForegroundOnPause: false,
+      // Use a monochrome drawable icon for notifications (white-only)
+      // androidNotificationIcon: 'drawable/ic_notification',
+    ),
+  );
+
+  // Register handler in service locator for later use in UI
+  // ignore: unnecessary_cast
+  sl.registerSingleton<MyAudioHandler>(audioHandler as MyAudioHandler);
 
   runApp(MyApp());
   SystemChrome.setPreferredOrientations([
