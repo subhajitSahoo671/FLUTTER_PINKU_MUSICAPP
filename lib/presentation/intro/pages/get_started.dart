@@ -31,7 +31,7 @@ class GetStartedPage extends StatelessWidget {
                   //  Padding(padding: EdgeInsets.only(top: 15)),
                   Align(
                     alignment: Alignment.topCenter,
-                    child: AppLogoWidget(width: 55, height: 55)
+                    child: AppLogoWidget(width: 160, height: 50)
                   ),
                   Spacer(),
                   Text(

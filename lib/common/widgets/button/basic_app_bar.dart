@@ -5,10 +5,11 @@ import 'package:flutter_pinku_app/common/widgets/button/basic_back_button.dart';
 //import 'package:flutter_pinku_app/presentation/auth/pages/signup_or_signin.dart';
 
 class BasicAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const BasicAppBar({super.key, this.title, this.hideBackBotton = false});
+  const BasicAppBar({super.key, this.title, this.hideBackBotton = false,  this.action,});
 
   final Widget? title;
   final bool hideBackBotton;
+  final Widget? action;
   @override
   Widget build(BuildContext context) {
     return AppBar(
@@ -17,6 +18,7 @@ class BasicAppBar extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: true,
       title: title ?? Text(""),
       leading: hideBackBotton ? null : basicBackButton(context),
+      actions: action != null ? [action!] : [],
     );
   }
 

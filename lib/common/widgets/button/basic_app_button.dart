@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_pinku_app/core/configs/theme/app_colors.dart';
 
 class BasicAppButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -13,10 +14,16 @@ class BasicAppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(onPressed: onPressed,
-    style: ElevatedButton.styleFrom(
-      minimumSize: Size.fromHeight(height ?? 70),
-    ),
-     child: Text(title));
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30),
+        gradient: AppColors.primaryGradient,
+      ),
+      child: ElevatedButton(onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        minimumSize: Size.fromHeight(height ?? 70),
+      ),
+       child: Text(title)),
+    );
   }
 }

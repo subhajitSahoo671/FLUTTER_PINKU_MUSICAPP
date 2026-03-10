@@ -53,7 +53,7 @@ class _SigninPageState extends State<SigninPage> {
           ),
         ),
       ),
-      appBar: BasicAppBar(title: AppLogoWidget(width: 45, height: 45)),
+      appBar: BasicAppBar(title: AppLogoWidget(width: 120, height: 45)),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 40),
         child: SingleChildScrollView(

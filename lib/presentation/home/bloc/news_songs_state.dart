@@ -17,6 +17,8 @@ class NewsSongsLoaded extends NewsSongsState {
       items.add(
         MediaItem(
           id: song.songURL,
+          // playable: song.isFavorite,
+          genre: song.songId,
           // album: song.album ?? 'Unknown Album',
           title: song.title,
           artist: song.artist,

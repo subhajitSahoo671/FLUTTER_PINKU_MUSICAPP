@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 // import 'dart:developer';
 
 import 'package:audio_service/audio_service.dart';
@@ -52,6 +53,10 @@ class MyAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler{
         bufferedPosition: audioPlayer.bufferedPosition,
         speed: audioPlayer.speed,
         queueIndex: event.currentIndex,
+        // repeatMode: audioPlayer.loopMode == LoopMode.one ? AudioServiceRepeatMode.one : 
+        //             audioPlayer.loopMode == LoopMode.all ? AudioServiceRepeatMode.all : 
+        //             AudioServiceRepeatMode.none,
+        // shuffleMode: audioPlayer.shuffleModeEnabled ? AudioServiceShuffleMode.all : AudioServiceShuffleMode.none,
       )
     );
   }
@@ -78,10 +83,12 @@ class MyAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler{
 
   // Handle completion of a song to automatically skip to the next one
     audioPlayer.processingStateStream.listen((state) {
+      log(  "Processing state: $state");
       if(state == ProcessingState.completed){
         skipToNext();
       }
     });
+
   }
 
   //play fuction to start playback
@@ -110,4 +117,30 @@ class MyAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler{
   //skip to the previous song in the queue
   @override
   Future<void> skipToPrevious() => audioPlayer.seekToPrevious();
+
+  @override
+  Future<void> setRepeatMode(AudioServiceRepeatMode repeatMode) async {  
+     playbackState.add(
+      playbackState.value.copyWith(
+        repeatMode: repeatMode,
+      )
+    );
+     audioPlayer.setLoopMode(
+      repeatMode == AudioServiceRepeatMode.one ? LoopMode.one : 
+      repeatMode == AudioServiceRepeatMode.all ? LoopMode.all : 
+      LoopMode.off
+    );
+    
+  }
+
+  @override
+  Future<void> setShuffleMode(AudioServiceShuffleMode shuffleMode) async {
+    final enable = shuffleMode == AudioServiceShuffleMode.all;
+    audioPlayer.setShuffleModeEnabled(enable);
+    playbackState.add(
+      playbackState.value.copyWith(
+        shuffleMode: shuffleMode,
+      )
+    );
+  }
 }

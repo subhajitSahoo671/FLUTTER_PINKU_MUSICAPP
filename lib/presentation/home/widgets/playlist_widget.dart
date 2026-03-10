@@ -2,6 +2,7 @@
 
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_pinku_app/common/widgets/favorite_button/favorite_button.dart';
 import 'package:flutter_pinku_app/core/services/my_audio_handler.dart';
 // import 'package:flutter_pinku_app/common/helpers/is_dark_mode.dart';
 import 'package:flutter_pinku_app/core/configs/theme/app_colors.dart';
@@ -38,6 +39,7 @@ class PlaylistWidget extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   traversalEdgeBehavior: TraversalEdgeBehavior.closedLoop,
+                  
                   builder: (context) {
                     return SongPlayerPage(
                       item: itemSnapshot.data!,
@@ -49,7 +51,7 @@ class PlaylistWidget extends StatelessWidget {
               );
             },
             child: SizedBox(
-              width: MediaQuery.sizeOf(context).width,
+               width: MediaQuery.sizeOf(context).width,
               child: Row(
                 //mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -109,10 +111,11 @@ class PlaylistWidget extends StatelessWidget {
                       ],
                     ),
                   ),
+                     SizedBox(width: 25,),
                   Expanded(
                     flex: 4,
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         itemSnapshot.data!.id == songEntity.id 
                         ? audioHandler.playbackState.value.playing 
@@ -125,10 +128,10 @@ class PlaylistWidget extends StatelessWidget {
                             fontSize: 14,
                           ),
                         ),
-                        SizedBox(width: 50),
+                        //SizedBox(width: 50),
                         itemSnapshot.data!.id == songEntity.id
                             ? IconButton.filledTonal(
-                              padding: EdgeInsets.all(-5),
+                              // padding: EdgeInsets.all(-5),
                               onPressed: () {
                                 if (audioHandler.playbackState.value.playing) {
                                   audioHandler.pause();
@@ -143,11 +146,7 @@ class PlaylistWidget extends StatelessWidget {
                                 color: Colors.purpleAccent.shade700.withGreen(110),
                               )
                             )
-                       : Icon(
-                          Icons.favorite_border_rounded,
-                          //  color: AppColors.greyText.withBlue(50).withValues(alpha: 100)
-                          color: Colors.purpleAccent.shade700.withGreen(100),
-                        ),
+                       : FavoriteButton(songEntity: songEntity, color: Colors.purpleAccent.shade700.withGreen(100),)
                       ],
                     ),
                   ),

@@ -39,8 +39,8 @@ class AppTheme {
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         elevation: 3.0, // Adjust the elevation for shadow depth
-       shadowColor: Colors.purpleAccent, // Customize shadow color
-        backgroundColor: AppColors.primary,
+       shadowColor: Colors.transparent, // Customize shadow color
+        backgroundColor: AppColors.primary.withValues(alpha: 0.8),
         foregroundColor: Colors.white,
         textStyle: const TextStyle(
           fontSize: 22,
@@ -89,8 +89,8 @@ class AppTheme {
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         elevation: 3.0, // Adjust the elevation for shadow depth
-        shadowColor: Colors.purpleAccent, // Customize shadow color
-        backgroundColor: AppColors.primary,
+        shadowColor: Colors.transparent, // Customize shadow color
+        backgroundColor: AppColors.primary.withValues(alpha: 0.8),
         foregroundColor: Colors.white,
         textStyle: const TextStyle(
           fontSize: 22,

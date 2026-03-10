@@ -16,7 +16,9 @@ import 'package:flutter_pinku_app/presentation/song_player/pages/song_player.dar
 
 class NewsSongs extends StatelessWidget {
   final MyAudioHandler audioHandler;
-  const NewsSongs({super.key, required this.audioHandler});
+  final List<MediaItem> songs;
+   
+  const NewsSongs({super.key, required this.audioHandler , this.songs = const []});
 
   @override
   Widget build(BuildContext context) {
@@ -60,24 +62,26 @@ class NewsSongs extends StatelessWidget {
     );
   }
 
-  Widget _songs(List<MediaItem> songs) {
+  Widget _songs(List<MediaItem> newSongs) {
     //log(songs[0].title);
     return ListView.separated(
       scrollDirection: Axis.horizontal,
-      itemCount: songs.length,
+      itemCount: newSongs.length,
       separatorBuilder: (BuildContext context, int index) {
         return SizedBox(width: 15);
       },
       shrinkWrap: true,
       itemBuilder: (BuildContext context, int index) {
         return StreamBuilder<MediaItem?>(stream: audioHandler.mediaItem, builder: (context, snapshot) {
-         
+          
           if (snapshot.data != null) {
             // log(  "hy${snapshot.data!.artUri}");
+            var newIndex = songs.length - index - 1;
           return  GestureDetector(
                  onTap: () {
-              if (snapshot.data!.id != songs[index].id) {
-                  audioHandler.skipToQueueItem(index);
+                 
+              if (snapshot.data!.id != songs[newIndex].id) {
+                  audioHandler.skipToQueueItem(newIndex);
                 }
             Navigator.push(
               context,
@@ -89,6 +93,7 @@ class NewsSongs extends StatelessWidget {
             );
           },
           child: SizedBox(
+            // color: snapshot.data!.id == songs[newIndex].id ? AppColors.greyText.withValues(alpha: 50) : Colors.transparent,
             width: 135,
             height: 250,
             child: Column(
@@ -100,14 +105,15 @@ class NewsSongs extends StatelessWidget {
                     borderRadius: BorderRadius.circular(30),
                     image: DecorationImage(
                       fit: BoxFit.cover,
-                      image: NetworkImage(songs[index].artUri.toString()),
+                      image: NetworkImage(newSongs[index].artUri.toString()),
                     ),
                   ),
-                  child: Align(
+                  child: snapshot.data!.id == songs[newIndex].id 
+                  ? Align(
                     alignment: Alignment.bottomRight,
                     child: Container(
-                      height: 32,
-                      width: 32,
+                      height: 33,
+                      width: 33,
                       transform: Matrix4.translationValues(-10, 10, 0),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
@@ -115,24 +121,39 @@ class NewsSongs extends StatelessWidget {
                             .withBlue(50)
                             .withValues(alpha: 200),
                       ),
-                      child: Icon(Icons.play_arrow_rounded, size: 22),
+                      child: IconButton(
+                        padding: EdgeInsets.all(0),
+                        onPressed: () {
+                         if (audioHandler.playbackState.value.playing) {
+                                  audioHandler.pause();
+                                } else {
+                                  audioHandler.play();
+                                }
+                      }, icon: Icon( audioHandler.playbackState.value.playing
+                                  ? Icons.pause_rounded
+                                  : Icons.play_arrow_rounded,
+                                   size: 23)),
                     ),
-                  ),
+                  )
+                  : null,
                 ),
                 SizedBox(height: 10),
                 Text(
-                  songs[index].title,
+                  newSongs[index].title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
+                    color: snapshot.data!.id == songs[newIndex].id ? Colors.purpleAccent.shade700.withGreen(
+                                          110,
+                                        ) : null,
                     // color: Colors.white
                   ),
                 ),
                 SizedBox(height: 5),
                 Text(
-                  songs[index].artist!,
+                  newSongs[index].artist!,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   softWrap: true,

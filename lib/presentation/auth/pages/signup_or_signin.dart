@@ -42,7 +42,7 @@ class SignupOrSignin extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    AppLogoWidget(width: 80, height: 80),
+                    AppLogoWidget(width: 240, height: 80),
                     SizedBox(height: 60),
                     Text(
                       "Enjoy Listening To Music",

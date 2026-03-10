@@ -20,4 +20,10 @@ class AppImages {
 
   static const String homeTopArtist =
       '${basePath}homeArtist$format';
+
+  static const String appLogo =
+      '${basePath}musicAppLogo123$format';
+
+  static const String splashLogo =
+      '${basePath}musicAppLogo12$format';
 }

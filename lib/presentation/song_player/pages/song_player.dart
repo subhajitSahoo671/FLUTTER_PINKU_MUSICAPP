@@ -1,11 +1,15 @@
 
 // import 'dart:developer';
 
+//import 'dart:developer';
+
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_pinku_app/common/widgets/favorite_button/favorite_button.dart';
 // import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_pinku_app/core/configs/theme/app_colors.dart';
 import 'package:flutter_pinku_app/core/services/my_audio_handler.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 // import 'package:flutter_pinku_app/domain/entities/song/song.dart';
 // import 'package:flutter_pinku_app/presentation/song_player/bloc/song_player_cubit.dart';
 //import 'package:flutter_pinku_app/presentation/song_player/bloc/song_player_state.dart';
@@ -35,7 +39,7 @@ class SongPlayerPage extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () {},
-            icon: Icon(Icons.menu_open_rounded, size: 25),
+            icon: FaIcon(FontAwesomeIcons.barsStaggered, size: 20),
           ),
         ],
         leading: IconButton(
@@ -44,7 +48,7 @@ class SongPlayerPage extends StatelessWidget {
           },
           icon: Icon(Icons.arrow_back_ios_new_rounded, size: 16),
         ),
-        backgroundColor: AppColors.gradient_1,
+        backgroundColor: AppColors.primary.withValues(alpha: 0.8),
         elevation: 0,
       ),
       body: _PlayerContent(item: item, audioHandler: audioHandler),
@@ -63,7 +67,7 @@ class _PlayerContent extends StatelessWidget {
     return Container(
           height: MediaQuery.sizeOf(context).height,
           width: MediaQuery.sizeOf(context).width,
-          color: AppColors.gradient_1,
+          color: AppColors.primary.withValues(alpha: 0.8),
           child: StreamBuilder<MediaItem?>(
             stream: audioHandler.mediaItem,
             builder: (context, itemSnapshot) {
@@ -80,7 +84,7 @@ class _PlayerContent extends StatelessWidget {
                     width: MediaQuery.sizeOf(context).width,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [Colors.white, Color(0xFF7C007E)],
+                        colors: [Colors.white, Color(0xff6C6AF0).withAlpha( 100)],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                       ),
@@ -95,11 +99,12 @@ class _PlayerContent extends StatelessWidget {
                         children: [
                           //SizedBox(height: 40),
                           _songCover(context, itemSnapshot.data!),
-                          SizedBox(height: 30),
+                          _loopingShuffling(context),
+                          SizedBox(height: 15),
                           _songDetails(itemSnapshot.data!),
-                          SizedBox(height: 70),
-                          songTools(context),
-                          SizedBox(height: 50),
+                          SizedBox(height: 40),
+                          songTools(context, itemSnapshot.data!),
+                          SizedBox(height: 40),
                           _songSlider(context, itemSnapshot.data!), 
                         ],
                       ),
@@ -130,6 +135,49 @@ class _PlayerContent extends StatelessWidget {
     );
   }
 
+  Widget _loopingShuffling(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            onPressed: () {
+              
+              audioHandler.playbackState.value.repeatMode == AudioServiceRepeatMode.all ?
+                audioHandler.setRepeatMode(AudioServiceRepeatMode.one) :
+              audioHandler.playbackState.value.repeatMode == AudioServiceRepeatMode.one ?
+                audioHandler.setRepeatMode(AudioServiceRepeatMode.none) :
+                audioHandler.setRepeatMode(AudioServiceRepeatMode.all);
+                //log( "Repeat mode changed: ${audioHandler.playbackState.value.repeatMode}" );
+            },
+            icon: Icon(
+              audioHandler.playbackState.value.repeatMode == AudioServiceRepeatMode.all ? Icons.repeat_rounded :
+              audioHandler.playbackState.value.repeatMode == AudioServiceRepeatMode.one ? Icons.repeat_one_rounded :
+              Icons.repeat_rounded,
+              color: audioHandler.playbackState.value.repeatMode != AudioServiceRepeatMode.none ? Colors.pink.shade900 : Colors.white70, 
+              size: 28,
+            ),
+          ),
+          SizedBox(width: 20),
+          IconButton(
+            onPressed: () {
+              audioHandler.playbackState.value.shuffleMode == AudioServiceShuffleMode.all ?
+                audioHandler.setShuffleMode(AudioServiceShuffleMode.none) :
+              audioHandler.setShuffleMode(AudioServiceShuffleMode.all);
+            },
+            icon: audioHandler.playbackState.value.shuffleMode == AudioServiceShuffleMode.all ? Icon(
+              Icons.shuffle_rounded, color: Colors.pink.shade900, size: 28) :
+               Icon(
+              Icons.shuffle_rounded, color: Colors.white70, size: 28),
+          ),
+        ],
+      ),
+    );
+  }
+
+   
+
   Widget _songDetails( MediaItem itemSnapshot) {
     return Column(
       children: [
@@ -154,7 +202,7 @@ class _PlayerContent extends StatelessWidget {
     );
   }
 
-  Widget songTools(BuildContext context) {
+  Widget songTools(BuildContext context, itemSnapshot) {
     return SizedBox(
       width: MediaQuery.sizeOf(context).width,
       height: 40,
@@ -162,14 +210,7 @@ class _PlayerContent extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(
-              Icons.favorite_rounded,
-              color: Colors.pinkAccent.shade700,
-              size: 30,
-            ),
-          ),
+          FavoriteButton(songEntity: itemSnapshot, color: Colors.pink.shade800, size: 30,),
           VerticalDivider(
             width: 3,
             color: Colors.pinkAccent.shade700,
@@ -194,10 +235,10 @@ class _PlayerContent extends StatelessWidget {
           ),
           IconButton(
             onPressed: () {},
-            icon: Icon(
-              Icons.share,
-              color: Colors.pinkAccent.shade700,
-              size: 30,
+            icon: FaIcon(
+              FontAwesomeIcons.shareNodes,
+              color: Colors.pink.shade800,
+              size: 25,
             ),
           ),
         ],
@@ -221,6 +262,7 @@ class _PlayerContent extends StatelessWidget {
             return Column(
               children: [
                 Slider(
+                  activeColor: Color(0xff5A8FF0).withValues(alpha: 100),
                   value: value,
                   min: 0.0,
                   max: maxSeconds,
@@ -267,7 +309,7 @@ class _PlayerContent extends StatelessWidget {
               topRight: Radius.circular(30),
             ),
             gradient: LinearGradient(
-              colors: [AppColors.gradient_1, AppColors.gradient_2],
+              colors: [AppColors.gradient_1.withValues(alpha: 0.8), AppColors.gradient_2.withValues(alpha: 0.8)],
               begin: AlignmentGeometry.topLeft,
               end: AlignmentGeometry.bottomRight,
             ),

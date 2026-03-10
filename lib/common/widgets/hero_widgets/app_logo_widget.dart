@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pinku_app/core/configs/assets/app_vectors.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_pinku_app/core/configs/assets/app_images.dart';
+// import 'package:flutter_pinku_app/core/configs/assets/app_vectors.dart';
+// import 'package:flutter_svg/svg.dart';
 
 class AppLogoWidget extends StatelessWidget {
   const AppLogoWidget({super.key,required this.width, required this.height});
@@ -12,11 +13,11 @@ class AppLogoWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Hero(
       tag: 'app-logo',
-      child: SvgPicture.asset(
-            AppVectors.logo,
+      child: Image.asset(
+            AppImages.appLogo,
             width: width,
             height: height,
-            fit: BoxFit.cover,
+            fit: BoxFit.contain,
           ),
     );
   }

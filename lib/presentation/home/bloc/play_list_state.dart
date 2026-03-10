@@ -26,6 +26,8 @@ class PlayListLoaded extends PlayListState {
           title: song.title,
           artist: song.artist,
           artUri: Uri.parse(song.imageURL),
+          // playable: song.isFavorite,
+          genre: song.songId,
           // genre: song.duration.toString(),
           duration: Duration(
             minutes: double.parse(song.duration.toString()).toInt(),

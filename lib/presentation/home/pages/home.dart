@@ -13,6 +13,8 @@ import 'package:flutter_pinku_app/presentation/home/widgets/play_list.dart';
 //import 'package:flutter_svg/flutter_svg.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter_pinku_app/core/services/my_audio_handler.dart';
+import 'package:flutter_pinku_app/presentation/profile/pages/profile.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -40,7 +42,12 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: BasicAppBar(
-        title: AppLogoWidget(width: 45, height: 45),
+        title: AppLogoWidget(width: 120, height: 45),
+        action: IconButton(onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
+            return ProfilePage();
+          },));
+        }, icon: FaIcon(FontAwesomeIcons.solidCircleUser, color: AppColors.primary, size: 26,)),
         hideBackBotton: true,
       ),
       body: SingleChildScrollView(
@@ -63,7 +70,7 @@ class _HomePageState extends State<HomePage> {
                       height: 280,
                       child: TabBarView(
                         children: [
-                          NewsSongs(audioHandler: widget.audioHandler,),
+                          NewsSongs(audioHandler: widget.audioHandler, songs: widget.songs),
                           Container(),
                           Container(),
                           Container(),

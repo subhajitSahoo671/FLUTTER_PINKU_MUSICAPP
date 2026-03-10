@@ -1,0 +1,84 @@
+import 'package:audio_service/audio_service.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_pinku_app/common/bloc/favorite_button/favorite_button_cubit.dart';
+import 'package:flutter_pinku_app/common/bloc/favorite_button/favorite_button_state.dart';
+import 'package:flutter_pinku_app/domain/usecases/song/is_favorite_song.dart';
+import 'package:flutter_pinku_app/service_locator.dart';
+
+class FavoriteButton extends StatefulWidget {
+  final MediaItem songEntity;
+  final Color color;
+  final double? size;
+  const FavoriteButton({super.key, required this.songEntity,  required this.color,  this.size ,});
+
+  @override
+  State<FavoriteButton> createState() => _FavoriteButtonState();
+}
+
+class _FavoriteButtonState extends State<FavoriteButton> {
+
+ late bool isFavorite;
+
+  @override
+  void initState() {
+    super.initState();
+    isFavorite = false;
+    _isFavorite();
+  }
+
+  Future<void> _isFavorite() async{
+      isFavorite = await sl<IsFavoriteSongUseCase>().call(
+          params: widget.songEntity.genre
+        );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(create: (context) => FavoriteButtonCubit(),
+    child: BlocBuilder<FavoriteButtonCubit,FavoriteButtonState>(
+      builder: (context, state) {
+        // bool isFavorite = widget.songEntity.playable!;
+      if (state is FavoriteButtonInitial) {
+        return IconButton(
+                        onPressed: () {
+                          context.read<FavoriteButtonCubit>().favoriteButtonUpdated(
+                            widget.songEntity.genre!
+                          );
+                        },
+                          icon: Icon( 
+                            isFavorite
+                            ? Icons.favorite_rounded  
+                            : Icons.favorite_border_rounded,
+                          //  color: AppColors.greyText.withBlue(50).withValues(alpha: 100)
+                          color: widget.color,
+                          size: widget.size,
+                          )
+                        );
+      }
+       
+       if (state is FavoriteButtonUpdated) {
+        return IconButton(
+                        onPressed: () {
+                            context.read<FavoriteButtonCubit>().favoriteButtonUpdated(
+                            widget.songEntity.genre!
+                          );
+
+                          // isFavorite = state.isFavorite;
+                        },
+                          icon: Icon( 
+                            state.isFavorite
+                            ? Icons.favorite_rounded  
+                            : Icons.favorite_border_rounded,
+                          //  color: AppColors.greyText.withBlue(50).withValues(alpha: 100)
+                          color: widget.color,
+                          size: widget.size,
+                          )
+                        );
+      }
+        return Container();
+    },
+    ),
+    );
+  }
+}

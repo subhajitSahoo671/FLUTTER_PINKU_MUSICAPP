@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 //import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_pinku_app/common/helpers/is_dark_mode.dart';
+// import 'package:flutter_pinku_app/common/helpers/is_dark_mode.dart';
 import 'package:flutter_pinku_app/core/configs/assets/app_images.dart';
 //import 'package:flutter_pinku_app/presentation/choose_mode/bloc/theme_cubit.dart';
 import 'package:flutter_pinku_app/presentation/intro/pages/get_started.dart';
@@ -28,10 +28,10 @@ class _SplashPageState extends State<SplashPage> {
         //   builder: (context, mode) => 
           Image.asset(
            //mode == ThemeMode.light ? AppImages.logoLight : AppImages.logoDark,
-           context.isDarkMode ? AppImages.logoDark : AppImages.logoLight,
-            width: 300,
-            height: 300,
-            fit: BoxFit.cover,
+          AppImages.splashLogo,
+            width: 200,
+            height: 200,
+            fit: BoxFit.contain,
           ),
        // ),
       ),
