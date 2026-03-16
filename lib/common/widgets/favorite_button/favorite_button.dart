@@ -8,9 +8,11 @@ import 'package:flutter_pinku_app/service_locator.dart';
 
 class FavoriteButton extends StatefulWidget {
   final MediaItem songEntity;
+  final Function? function;
   final Color color;
   final double? size;
-  const FavoriteButton({super.key, required this.songEntity,  required this.color,  this.size ,});
+  final bool? isFavorite;
+  const FavoriteButton({super.key, required this.songEntity,  required this.color,  this.size , this.isFavorite, this.function});
 
   @override
   State<FavoriteButton> createState() => _FavoriteButtonState();
@@ -23,7 +25,7 @@ class _FavoriteButtonState extends State<FavoriteButton> {
   @override
   void initState() {
     super.initState();
-    isFavorite = false;
+    isFavorite = widget.isFavorite ?? false;
     _isFavorite();
   }
 
@@ -41,10 +43,13 @@ class _FavoriteButtonState extends State<FavoriteButton> {
         // bool isFavorite = widget.songEntity.playable!;
       if (state is FavoriteButtonInitial) {
         return IconButton(
-                        onPressed: () {
-                          context.read<FavoriteButtonCubit>().favoriteButtonUpdated(
+                        onPressed: () async{
+                        await context.read<FavoriteButtonCubit>().favoriteButtonUpdated(
                             widget.songEntity.genre!
                           );
+                          if (widget.function != null) {
+                            widget.function!();
+                          }
                         },
                           icon: Icon( 
                             isFavorite

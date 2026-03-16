@@ -10,13 +10,21 @@ class MyAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler{
 
   AudioPlayer audioPlayer=AudioPlayer();
   
+  // Stream subscriptions to manage and prevent duplicates
+  StreamSubscription? _playbackEventSubscription;
+  StreamSubscription? _processingStateSubscription;
+  StreamSubscription? _currentIndexSubscription;
+  
   
   UriAudioSource _createAudioSource(MediaItem item){
     return ProgressiveAudioSource(Uri.parse(item.id));
   }
 
   void _listenForCurrentSongIndexChanges(){
-    audioPlayer.currentIndexStream.listen((index) {
+    // Cancel existing subscription to avoid duplicates
+    _currentIndexSubscription?.cancel();
+    
+    _currentIndexSubscription = audioPlayer.currentIndexStream.listen((index) {
       final playlist = queue.value;
       if(index != null && playlist.length > index){
         mediaItem.add(playlist[index]);
@@ -63,41 +71,62 @@ class MyAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler{
 
    // function to initialize the audio player with a list of songs
   Future<void> initSongs({required List<MediaItem> songs}) async{
-    audioPlayer.playbackEventStream.listen(_boardcastState);
-    
-    final audioSource = songs.map(_createAudioSource).toList();
+    try {
+      // Cancel existing subscriptions to avoid duplicates
+      _playbackEventSubscription?.cancel();
+      _processingStateSubscription?.cancel();
+      
+      _playbackEventSubscription = audioPlayer.playbackEventStream.listen(_boardcastState);
+      
+      final audioSource = songs.map(_createAudioSource).toList();
 
-    await audioPlayer.setAudioSources(audioSource);
+      await audioPlayer.setAudioSources(audioSource);
 
-    //add the songs to the queue
-    final newQueue = queue.value..addAll(songs);  
-    queue.add(newQueue);
+      //add the songs to the queue
+      final newQueue = queue.value..addAll(songs);  
+      queue.add(newQueue);
 
-    // Ensure we have a current mediaItem for the notification/controls
-    if (newQueue.isNotEmpty && mediaItem.value == null) {
-      mediaItem.add(newQueue[0]);
-    }
-
-    //listen for changes in the current song index
-    _listenForCurrentSongIndexChanges();
-
-  // Handle completion of a song to automatically skip to the next one
-    audioPlayer.processingStateStream.listen((state) {
-      log(  "Processing state: $state");
-      if(state == ProcessingState.completed){
-        skipToNext();
+      // Ensure we have a current mediaItem for the notification/controls
+      if (newQueue.isNotEmpty && mediaItem.value == null) {
+        mediaItem.add(newQueue[0]);
       }
-    });
 
+      //listen for changes in the current song index
+      _listenForCurrentSongIndexChanges();
+
+    // Handle completion of a song to automatically skip to the next one
+      _processingStateSubscription = audioPlayer.processingStateStream.listen((state) {
+        log("Processing state: $state");
+        if(state == ProcessingState.completed){
+          skipToNext();
+        }
+      }, onError: (error) {
+        log("Error in processing state stream: $error");
+      });
+    } catch (e) {
+      log("Error initializing songs: $e");
+    }
   }
 
   //play fuction to start playback
   @override
-  Future<void> play() => audioPlayer.play();
+  Future<void> play() async {
+    try {
+      await audioPlayer.play();
+    } catch (e) {
+      log("Error playing audio: $e");
+    }
+  }
 
   //pause function to pause playback
   @override
-  Future<void> pause() => audioPlayer.pause();
+  Future<void> pause() async {
+    try {
+      await audioPlayer.pause();
+    } catch (e) {
+      log("Error pausing audio: $e");
+    }
+  }
 
   @override
   Future<void> seek(Duration position) => audioPlayer.seek(position);
@@ -105,18 +134,34 @@ class MyAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler{
   //skip to a specific song in the queue and start playback
   @override
   Future<void> skipToQueueItem(int index) async{
-    if(index < 0 || index >= queue.value.length) return;
-    await audioPlayer.seek(Duration.zero, index: index);
-     play();
+    try {
+      if(index < 0 || index >= queue.value.length) return;
+      await audioPlayer.seek(Duration.zero, index: index);
+      await play();
+    } catch (e) {
+      log("Error skipping to queue item: $e");
+    }
   }
 
   //skip to the next song in the queue
   @override
-  Future<void> skipToNext() => audioPlayer.seekToNext();
+  Future<void> skipToNext() async {
+    try {
+      await audioPlayer.seekToNext();
+    } catch (e) {
+      log("Error skipping to next: $e");
+    }
+  }
 
   //skip to the previous song in the queue
   @override
-  Future<void> skipToPrevious() => audioPlayer.seekToPrevious();
+  Future<void> skipToPrevious() async {
+    try {
+      await audioPlayer.seekToPrevious();
+    } catch (e) {
+      log("Error skipping to previous: $e");
+    }
+  }
 
   @override
   Future<void> setRepeatMode(AudioServiceRepeatMode repeatMode) async {  
@@ -142,5 +187,13 @@ class MyAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler{
         shuffleMode: shuffleMode,
       )
     );
+  }
+
+  // Cleanup method to dispose of subscriptions
+  void dispose() {
+    _playbackEventSubscription?.cancel();
+    _processingStateSubscription?.cancel();
+    _currentIndexSubscription?.cancel();
+    audioPlayer.dispose();
   }
 }

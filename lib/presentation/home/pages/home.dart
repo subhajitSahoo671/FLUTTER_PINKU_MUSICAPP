@@ -45,7 +45,7 @@ class _HomePageState extends State<HomePage> {
         title: AppLogoWidget(width: 120, height: 45),
         action: IconButton(onPressed: () {
           Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
-            return ProfilePage();
+            return ProfilePage(audioHandler: widget.audioHandler);
           },));
         }, icon: FaIcon(FontAwesomeIcons.solidCircleUser, color: AppColors.primary, size: 26,)),
         hideBackBotton: true,
